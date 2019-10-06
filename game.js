@@ -56,124 +56,152 @@ function Cell(c , r, type)
 	}
 }
 
+function Point(x, y)
+{
+	this.x = x
+	this.y = y;
+}
+
 //set walls as default tiles
 function allwalls()
 {
-	for (var r = 0; r < rows; r++)
+	for (var r = 0; r < rows+1; r++)
 	{
-		grid[r]=[];
-		for (var c = 0; c < cols; c++)
+		for (var c = 0; c < cols+1; c++)
 		{
 			var cell = new Cell(c, r, wallTexture);
-			grid[r].push(cell);
+			cell.show();
 		}
 	}
 }
 
-function generate(){
+function generate()
+{
+	var width = cols+1;
+	var height = rows+1;	
+
+	const NORTH = "N";
+	const SOUTH = "S";
+	const EAST = "E";
+	const WEST = "W";
+
+	var start = new Point(1,1);
+
+	for(var x = 0; x < height; x++)
+	{
+		maze[x] = [];
+		for(var y = 0; y  < width; y++)
+		{
+			maze[x][y] = false;
+		}
+	}
+	maze[start.x][start.y]=true;
+
+
+	var back;
+	var move;
+	var possibleDir;
+	var pos = start;
+
 	var moves = [];
-	for(var i = 0; i < rows; i ++)
+	moves.push(pos.y+(pos.x*width));
+	while(moves.length)
 	{
-		maze[i] = [];
-		for(var j = 0; j < cols; j ++)
+		possibleDir = "";
+		console.log("x:"+pos.x);
+		console.log("y:"+pos.y);
+				
+		if ((pos.x + 2 < height ) && (maze[pos.x + 2][pos.y] == false) && (pos.x + 2 != true) && (pos.x + 2 != height - 1) )
 		{
-			maze[i][j] = 1;
+			possibleDir += SOUTH;
+		}
+		
+		if ((pos.x - 2 >= 0 ) && (maze[pos.x - 2][pos.y] == false) && (pos.x - 2 != true) && (pos.x - 2 != height - 1) )
+		{
+			possibleDir += NORTH;
+		}
+		
+		if ((pos.y - 2 >= 0 ) && (maze[pos.x][pos.y - 2] == false) && (pos.y - 2 != true) && (pos.y - 2 != width - 1) )
+		{
+			possibleDir += WEST;
+		}
+		
+		if ((pos.y + 2 < width ) && (maze[pos.x][pos.y + 2] == false) && (pos.y + 2 != true) && (pos.y + 2 != width - 1) )
+		{
+			possibleDir += EAST;
+		}
+		
+		if ( possibleDir.length > 0 )
+		{
+			move = randInt(0, (possibleDir.length));
+			console.log("possible:" + possibleDir)
+			console.log("max: " + (possibleDir.length));
+			console.log("move:" + move);
+			switch ( possibleDir.charAt(move) )
+			{
+				case NORTH: 
+					maze[pos.x - 2][pos.y] = true;
+					maze[pos.x - 1][pos.y] = true;
+					pos.x -=2;
+					break;
+				
+				case SOUTH: 
+					maze[pos.x + 2][pos.y] = true;
+					maze[pos.x + 1][pos.y] = true;
+					pos.x +=2;
+					break;
+				
+				case WEST: 
+					maze[pos.x][pos.y - 2] = true;
+					maze[pos.x][pos.y - 1] = true;
+					pos.y -=2;
+					break;
+				
+				case EAST: 
+					maze[pos.x][pos.y + 2] = true;
+					maze[pos.x][pos.y + 1] = true;
+					pos.y +=2;
+					break;        
+			}
+			
+			moves.push(pos.y + (pos.x * width));
+		}
+		else
+		{
+			back = moves.pop();
+			pos.x = Math.floor(back / width);
+			pos.y = back % width;
 		}
 	}
-	var posX = 1;
-    var posY = 1;
-	maze[posX][posY] = 0; 
-	moves.push(posY + posY * cols);
-	while(moves.length > 0)
+
+	for ( var x = 0; x < height; x++ )
 	{
-		if(moves.length)
-		{       
-			var possibleDirections = "";
-			if(posX+1 > 0 && posX + 1 < rows - 1 && maze[posX + 1][posY] == 1){
-				possibleDirections += "S";
-			}
-			if(posX-1 > 0 && posX - 1 < rows - 1 && maze[posX - 1][posY] == 1){
-				possibleDirections += "N";
-			}
-			if(posY-1 > 0 && posY - 1 < cols - 1 && maze[posX][posY - 1] == 1){
-				possibleDirections += "W";
-			}
-			if(posY+1 > 0 && posY + 1 < cols - 1 && maze[posX][posY + 1] == 1)
+		grid[x]=[];
+		for ( var y = 0; y < width; y++ )
+		{
+			if(maze[x][y] == true)
 			{
-				possibleDirections += "E";
-			} 
-			if(possibleDirections){
-				//var move = game.rnd.between(0, possibleDirections.length - 1);
-				var move = Math.floor(Math.random() * (possibleDirections.length - 1));
-				//console.log(move);
-				switch (possibleDirections[move])
-				{
-					case "N": 
-						maze[posX - 2][posY] = 0;
-						maze[posX - 1][posY] = 0;
-						posX -= 2;
-						break;
-					case "S":
-						maze[posX + 2][posY] = 0;
-						maze[posX + 1][posY] = 0;
-						posX += 2;
-						break;
-					case "W":
-						maze[posX][posY - 2] = 0;
-						maze[posX][posY - 1] = 0;
-						posY -= 2;
-						break;
-					case "E":
-						maze[posX][posY + 2]=0;
-						maze[posX][posY + 1]=0;
-						posY += 2;
-						break;         
-				}
-				moves.push(posY + posX * cols);     
+				var cell = new Cell(x, y, dirtTexture);
+				grid[x][y] = cell;
+				grid[x][y].show();
 			}
 			else
 			{
-				var back = moves.pop();
-				posX = Math.floor(back / cols);
-				posY = back % cols;
+				var cell= new Cell(x, y, wallTexture);
+				grid[x][y]= cell;
+				grid[x][y].show();
 			}
-			drawMaze(posX, posY)                                      
 		}
 	}
 }
 
-function drawMaze(x, y)
+function randInt(min, max)
 {
-	for(i = 0; i < rows; i ++)
-	{
-		grid[i]=[];
-		for(j = 0; j < cols; j ++)
-		{
-			if(maze[i][j] == 1)
-			{
-				var cell = new Cell(j, i, wallTexture);
-				grid[i].push(cell);
-			}
-			else
-			{
-				var cell = new Cell(j, i, dirtTexture);
-				grid[i].push(cell);
-
-			}
-		}
-   }
+	return Math.floor(Math.random() * max) + min;
 }
 
+//allwalls();
 generate();
-
-//show all cells
-for (var r = 0; r < rows; r++)
-{
-	for (var c = 0; c < cols; c++)
-		{
-			grid[r][c].show();
-		}
-}
 
 console.log("rows:" + rows);
 console.log("cols:" + cols);
