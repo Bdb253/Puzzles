@@ -1,7 +1,7 @@
 //start chrome --allow-file-access-from-files
 var gameport = document.getElementById("gameport");
 
-var renderer = PIXI.autoDetectRenderer({width: 400, height: 400, backgroundColor: 0x3344ee});
+var renderer = PIXI.autoDetectRenderer({width: 440, height: 440, backgroundColor: 0x3344ee});
 gameport.appendChild(renderer.view);
 
 var stage = new PIXI.Container();
@@ -85,7 +85,7 @@ function generate()
 	const EAST = "E";
 	const WEST = "W";
 
-	var start = new Point(1,1);
+	var start = new Point(8,8);
 
 	for(var x = 0; x < height; x++)
 	{
