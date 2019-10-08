@@ -11,6 +11,7 @@ stage.sortableChildren = true;
 PIXI.Loader.shared.add("spriteSheet.json").load(setup);
 
 PIXI.sound.add('wrongWay', 'wrongWay.wav');
+PIXI.sound.add('select', 'select.wav');
 
 var cell_width = 40;
 var cols = Math.floor(renderer.width/cell_width);
@@ -76,6 +77,7 @@ function setup()
 		stage.removeChild(startText);
 		stage.removeChild(titleText);
 		stage.removeChild(creditText);
+		PIXI.sound.play('select');
 	};
 
 	creditText = new PIXI.Text("Credits");
@@ -91,6 +93,7 @@ function setup()
 		stage.removeChild(creditText);
 		stage.addChild(backText);
 		stage.addChild(authorText);
+		PIXI.sound.play('select');
 	}
 
 	backText = new PIXI.Text("Back");
@@ -101,6 +104,7 @@ function setup()
 	backText.interactive = true;
 	backText.click = function(e)
 	{
+		PIXI.sound.play('select');
 		stage.removeChild(backText);
 		stage.removeChild(authorText);
 		stage.addChild(startText);
@@ -316,8 +320,10 @@ function setup()
 
 	var player = new PIXI.Sprite(sheet.textures["char.png"]);
 
-	player.position.x = start.x * cell_width+5;
-	player.position.y = start.y * cell_width+5;
+	player.position.x = start.x * cell_width+20;
+	player.position.y = start.y * cell_width+20;
+	player.anchor.x = .5;
+	player.anchor.y = .5;
 	player.zIndex = 15;
 	stage.addChild(player);
 
@@ -326,6 +332,10 @@ function setup()
 		//w key
 		if(e.keyCode == 87)
 		{
+			if(player.angle != 0)
+			{
+				player.angle = 0;
+			}
 			if(grid[playerPos.x][playerPos.y-1].walkable)
 			{
 				var newy = player.position.y - 40;
@@ -340,6 +350,10 @@ function setup()
 		//s key
 		if(e.keyCode == 83)
 		{
+			if(player.angle != 180)
+			{
+				player.angle = 180;
+			}
 			if(grid[playerPos.x][playerPos.y+1].walkable)
 			{
 				var newy = player.position.y + 40;
@@ -354,6 +368,10 @@ function setup()
 		//a key
 		if(e.keyCode == 65)
 		{
+			if(player.angle != -90)
+			{
+				player.angle = -90;
+			}
 			if(grid[playerPos.x-1][playerPos.y].walkable)
 			{
 				var newX = player.position.x - 40;
@@ -368,6 +386,10 @@ function setup()
 		//d key
 		if(e.keyCode == 68)
 		{
+			if(player.angle != 90)
+			{
+				player.angle = 90;
+			}
 			if(grid[playerPos.x+1][playerPos.y].walkable)
 			{
 				var newX = player.position.x + 40;
@@ -415,6 +437,7 @@ function setup()
 	restartText.interactive = true;
 	restartText.click = function(e)
 	{
+		PIXI.sound.play('select');
 		location.reload();
 	};
 
